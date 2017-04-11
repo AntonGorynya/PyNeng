@@ -1,0 +1,20 @@
+#! /usr/bin/python3
+
+from sys import argv
+
+ignore = ['duplex', 'alias', 'Current configuration']
+
+def contains_words(text, words_list):
+    for word in words_list:
+        if text.find(word) != -1 or text =='!':
+            return True
+    return False 
+
+
+with open(argv[1], 'r') as f:
+	for command in f:
+		command = command.rstrip()
+		if contains_words(command, ignore):
+			continue
+		else:
+			print (command)

@@ -1,0 +1,14 @@
+#! /usr/bin/python
+
+import sys
+
+route = "O        10.0.24.0/24 [110/41] via 10.0.13.3, 3d18h, FastEthernet0/0"
+route = list(route.split())
+route.remove('via')
+route[route.index("O")] = "OSPF"
+route[2] = "".join(list(route[2])[1:-1])
+
+d_keys = ["Protocol", "Prefix", "AD/Metric", "Next-Hop", "Last update", "Outbound interface" ]
+
+ospf_data= dict(zip(d_keys,route))
+print ospf_data
