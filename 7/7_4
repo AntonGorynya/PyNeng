@@ -1,0 +1,41 @@
+#! /usr/bin/python3
+
+from sys import argv
+
+ignore = ['duplex', 'alias', 'Current configuration']
+
+def contains_words(text, words_list):
+    for word in words_list:
+        if text.find(word) != -1 or text.startswith('!'):
+            return True
+    return False 
+
+commands = []
+d = {}
+	
+with open(argv[1], 'r') as f:
+	d_key = ""
+	flag_top = True
+	for command in f:
+		command = command.rstrip()
+		if contains_words(command, ignore):
+			continue
+		else:			
+			if command.startswith(' ') == True:
+			# вложеная команда
+				commands.append(command)				
+			else:
+			# команда верхнего уровня
+				d.update({d_key: commands })
+				if flag_top:
+					d_key = command
+					flag_top == False
+				
+				d_key = command
+				commands = []
+				print(d)
+				print("=="*10)
+				d.clear()
+#d.pop('')
+#print(d)
+				
