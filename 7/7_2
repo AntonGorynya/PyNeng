@@ -1,0 +1,33 @@
+#! /usr/bin/python3
+# -*- coding: utf-8 -*-
+
+#    """
+#    trunk - словарь trunk-портов для которых необходимо сгенерировать конфигурацию.
+#
+#    Возвращает список всех команд, которые были сгенерированы на основе шаблона
+    
+
+
+def generate_trunk_config(trunk_dict):
+	for i in trunk_dict.keys():		
+		int_commands=[i]
+		for j in trunk_template:
+			if j.endswith('allowed vlan'):
+				int_commands.append(j+" "+ str(trunk_dict[i])[1:-1])
+			else:
+				int_commands.append(j)
+		print(int_commands)
+
+
+trunk_template = ['switchport trunk encapsulation dot1q',
+				'switchport mode trunk',
+				'switchport trunk native vlan 999',
+				'switchport trunk allowed vlan']
+
+trunk_dict = { 'FastEthernet0/1':[10,20,30],
+				'FastEthernet0/2':[11,30],
+				'FastEthernet0/4':[17] }
+
+
+
+generate_trunk_config(trunk_dict)
