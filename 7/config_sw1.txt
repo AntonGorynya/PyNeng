@@ -22,7 +22,7 @@ hostname sw1
 !
 interface Ethernet0/0
  switchport access vlan 100
- switchport mode trunk
+ switchport mode access
  duplex auto
  spanning-tree portfast edge trunk
 !
@@ -34,17 +34,21 @@ interface Ethernet0/1
  spanning-tree portfast edge trunk
 !
 interface Ethernet0/2
+ switchport mode acces
  duplex auto
 !         
 interface Ethernet0/3
  switchport trunk encapsulation dot1q
- switchport trunk allowed vlan 100
+ switchport trunk allowed vlan 200
  duplex auto
  switchport mode trunk
  spanning-tree portfast edge trunk
 !         
 interface Ethernet1/0
+ switchport access vlan 222
+ switchport mode access
  duplex auto
+ spanning-tree portfast edge trunk
 !
 interface Ethernet1/1
  duplex auto
@@ -53,6 +57,7 @@ interface Ethernet1/2
  duplex auto
 !
 interface Ethernet1/3
+ switchport mode access
  duplex auto
 !
 interface Vlan100
