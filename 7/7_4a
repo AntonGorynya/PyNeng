@@ -1,0 +1,68 @@
+#! /usr/bin/python3
+
+from sys import argv
+
+ignore = ['duplex', 'alias', 'Current configuration']
+
+def contains_words(text, words_list):
+    for word in words_list:
+        if text.find(word) != -1 or text.startswith('!'):
+            return True
+    return False 
+
+commands = []
+d = {}
+	
+with open(argv[1], 'r') as f:
+	d_key = ""
+	flag_top = True
+	for command in f:
+		command = command.rstrip()
+		if contains_words(command, ignore):
+			continue
+		else:			
+			if command.startswith(' ') == True:
+			# вложеная команда
+				commands.append(command)				
+			else:
+			# команда верхнего уровня
+				d.update({d_key: commands })
+				if flag_top:
+					d_key = command
+					flag_top == False
+				
+				d_key = command
+				commands = []
+#				print(d)
+#				print("=="*10)
+#				d.clear()
+d.pop('')
+
+for i in d:
+	if d[i] != [] and d[i][-1].startswith('  '):
+		flag_end = False
+		for position,j in enumerate(d[i]):
+			if flag_end == False:
+				if (str(j)[1:].startswith(' ') == False):
+					d[i][position]= {j.lstrip(): []}
+					j_backup = j.lstrip()
+					position_b = position
+				else:
+				# если 2 пробела в начале					
+#рабочий вариант					
+					for pp,g in enumerate(d[i][position:]):
+						 d[i][position+pp]=g.lstrip()
+					d[i][position-1]= {j_backup:d[i][position:]}
+					flag_end = True
+					print (d[i][position-1])
+					print ("=="*20)
+
+#-print(d)
+			
+				
+
+
+	
+
+
+				
