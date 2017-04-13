@@ -20,7 +20,8 @@
 
 def generate_access_config(access_dict, psecurity = False):
 	list = []
-	for i in access_dict.keys():		
+	for i in access_dict.keys():
+		list.append(i)	
 		for j in access_template:
 			if j.endswith('access vlan'):
 				list.append(j+" "+ str(access_dict[i]) )

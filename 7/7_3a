@@ -23,8 +23,7 @@ def get_int_vlan_map(config_file_name):
 				vlan_found = True
 			if command.startswith(' switchport trunk allowed'):
 				vlans = command.split()
-				d_trunk.update({key_t: vlans[vlans.index('vlan')+1:]})
-				print(key_t)
+				d_trunk.update({key_t: vlans[vlans.index('vlan')+1:]})				
 	return ({"access":d_access , "trunk":d_trunk})
 	
 if __name__ == "__main__":
