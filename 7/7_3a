@@ -5,27 +5,28 @@ from sys import argv
 
 config_file_name = argv[1]
 
-d_access = {}
-d_trunk = {}
 
-with open(config_file_name, 'r') as f:
-	for command in f:		
-		vlans =[]
-		if command.startswith('interface'):
-			key_t = command.rstrip()
-			vlan_found = False			
-		if command.startswith(' switchport mode access') and (vlan_found == False):
-			d_access.update({key_t: "1"})			
-		if command.startswith(' switchport access vlan'):			
-			d_access.update({key_t: command.split()[-1]})
-			vlan_found = True
-		if command.startswith(' switchport trunk allowed'):
-			vlans = command.split()
-			d_trunk.update({key_t: vlans[vlans.index('vlan')+1:]})
-			print(key_t)
-print("acess")
-print(d_access)
-print("trunk")
-print(d_trunk)
 
-			
+def get_int_vlan_map(config_file_name):
+	d_access = {}
+	d_trunk = {}
+	with open(config_file_name, 'r') as f:
+		for command in f:		
+			vlans =[]
+			if command.startswith('interface'):
+				key_t = command.rstrip()
+				vlan_found = False			
+			if command.startswith(' switchport mode access') and (vlan_found == False):
+				d_access.update({key_t: "1"})			
+			if command.startswith(' switchport access vlan'):			
+				d_access.update({key_t: command.split()[-1]})
+				vlan_found = True
+			if command.startswith(' switchport trunk allowed'):
+				vlans = command.split()
+				d_trunk.update({key_t: vlans[vlans.index('vlan')+1:]})
+				print(key_t)
+	return ({"access":d_access , "trunk":d_trunk})
+	
+if __name__ == "__main__":
+	print(get_int_vlan_map(config_file_name))
+	

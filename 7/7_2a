@@ -18,7 +18,7 @@ def generate_trunk_config(trunk_dict):
 			else:
 				int_commands.append(j)
 		d.update(dict({i: int_commands}))
-	print(d)
+	return (d)
 	
 		
 
@@ -33,5 +33,5 @@ trunk_dict = { 'FastEthernet0/1':[10,20,30],
 				'FastEthernet0/4':[17] }
 
 
-
-generate_trunk_config(trunk_dict)
+if __name__ == "__main__":
+	print(generate_trunk_config(trunk_dict))

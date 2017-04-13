@@ -29,5 +29,3 @@ trunk_dict = { 'FastEthernet0/1':[10,20,30],
 				'FastEthernet0/4':[17] }
 
 
-
-generate_trunk_config(trunk_dict)

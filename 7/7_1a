@@ -19,17 +19,17 @@
 
 
 def generate_access_config(access_dict, psecurity = False):
-	for i in access_dict.keys():
-		print (i)
+	list = []
+	for i in access_dict.keys():		
 		for j in access_template:
 			if j.endswith('access vlan'):
-				print (j+" "+ str(access_dict[i]) )
+				list.append(j+" "+ str(access_dict[i]) )
 				
 			else:
-				print (j)
+				list.append(j)
 		if psecurity:
-			print("\n".join(port_security))
-
+			list.extend(port_security)
+	return list
 
 
 access_dict = { 'FastEthernet0/12':10,
@@ -45,7 +45,7 @@ access_template = ['switchport mode access',
 port_security = ['switchport port-security maximum 2',
 			'switchport port-security violation restrict',
 			'switchport port-security']
-				
-generate_access_config(access_dict)
-print ("==========")
-generate_access_config(access_dict, psecurity = True)
+
+if __name__ == "__main__":
+	print(generate_access_config(access_dict))
+
