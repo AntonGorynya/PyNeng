@@ -1,0 +1,35 @@
+#! /usr/bin/python3
+
+from t_8_2 import parse_cdp_neighbors
+from draw_network_graph import draw_topology
+import copy
+
+#from sys import argv
+#cdp_n = argv[1]
+
+list_cpd_files = ["sh_cdp_n_r1.txt","sh_cdp_n_r2.txt","sh_cdp_n_r3.txt","sh_cdp_n_sw1.txt" ]
+cdp_neighbors_dict = {}
+
+for cdp_n in list_cpd_files:
+	with open(cdp_n , 'r') as f:
+		cdp_neighbors = f.read()
+		cdp_neighbors_dict.update(parse_cdp_neighbors(cdp_neighbors))
+		
+#удаляем идентичные пары ключ значение		
+def get_key(d, value):
+	for k, v in d.items():
+		if v == value:
+			return k
+
+d_copy=copy.deepcopy(cdp_neighbors_dict)
+for i,k in enumerate(cdp_neighbors_dict.keys()):	
+	for j,v in enumerate(cdp_neighbors_dict.values()):
+		if k == v:
+			if cdp_neighbors_dict[k] == get_key(cdp_neighbors_dict, v) and j > i:
+				del(d_copy[k])	
+
+draw_topology(d_copy)
+
+
+	
+	
