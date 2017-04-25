@@ -1,0 +1,20 @@
+#! /usr/bin/python
+#[\\d.]+
+
+
+from sys import argv
+import re
+
+
+regex = re.compile(argv[2])
+print (argv[2])
+
+with open(argv[1], 'r') as f:
+	sh_output=f.readlines()
+	for line in sh_output:
+		m = regex.match(line)
+		#print (m)
+		if m:
+			print(line.rstrip())
+			#print(m.group())
+	
