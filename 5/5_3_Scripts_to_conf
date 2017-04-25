@@ -1,0 +1,36 @@
+#! /usr/bin/python3
+
+access_template = ['switchport mode access',
+                   'switchport access vlan',
+                   'spanning-tree portfast',
+                   'spanning-tree bpduguard enable']
+
+trunk_template = ['switchport trunk encapsulation dot1q',
+                  'switchport mode trunk',
+                  'switchport trunk allowed vlan']
+
+fast_int = {'access':{'0/12':'10','0/14':'11','0/16':'17','0/17':'150'}, 
+            'trunk':{'0/1':['add','10','20'],
+                     '0/2':['only','11','30'],
+                     '0/4':['del','17']} }
+
+for int in fast_int['access']:
+    print ('interface FastEthernet' + int)
+    for command in access_template:
+        if command.endswith('access vlan'):
+            print ('{} {}'.format(command, fast_int['access'][int]))
+        else:
+            print ('{}'.format(command))
+			
+for int in fast_int['trunk']:
+	print ('interface FastEthernet' + int)
+	for command in trunk_template:
+		if command.endswith('allowed vlan'):
+			if fast_int['trunk'][int][0] == 'add':
+				print ('{} {} {}'.format(command,fast_int['trunk'][int][0] , ",".join(fast_int['trunk'][int][1::])))
+			elif fast_int['trunk'][int][0] == 'only':
+				print ('{} {}'.format(command, ",".join(fast_int['trunk'][int][1::])))
+			elif fast_int['trunk'][int][0] == 'del':
+				print ('{} {} {}'.format(command,fast_int['trunk'][int][0] , ",".join(fast_int['trunk'][int][1::])))
+		else:
+			print ('{}'.format(command))

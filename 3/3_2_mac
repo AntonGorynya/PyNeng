@@ -1,0 +1,21 @@
+#! /usr/bin/python
+
+import sys
+mac = ['aabb:cc80:7000', 'aabb:dd80:7340', 'aabb:ee80:7000', 'aabb:ff80:7000']
+mac_cisco = []
+
+def dpt (MAC):
+    MAC = ".".join(MAC.split(":"))
+    return MAC
+
+def c16to2(MAC):
+    MAC="".join(MAC.split(":"))
+    MAC = int(MAC, 16)
+    MAC2='{:032b}'.format(MAC)
+    print "10:", MAC," 2: ", MAC2
+    return MAC
+
+for i in mac:
+    mac_cisco.append(dpt(i))
+
+print (mac_cisco)
