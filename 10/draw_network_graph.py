@@ -6,8 +6,8 @@ import sys
 try:
     import graphviz as gv
 except ImportError:
-    print "Module graphviz needs to be installed"
-    print "pip install graphviz"
+    print ("Module graphviz needs to be installed")
+    print ("pip install graphviz")
     sys.exit()
 
 
@@ -16,7 +16,7 @@ styles = {
         'label': 'Network Map',
         'fontsize': '16',
         'fontcolor': 'white',
-        'bgcolor': '#3F3F3F',
+        'bgcolor': '#333333',
         'rankdir': 'BT',
     },
     'nodes': {
@@ -51,32 +51,37 @@ def apply_styles(graph, styles):
     return graph
 
 
-def draw_topology(topology_dict, out_filename='img/topology', style_dict=styles):
+def draw_topology(topology_dict):
     '''
     topology_dict - словарь с описанием топологии
 
-    Пример словаря topology_dict:
-        {('R4', 'Eth0/1'): ('R5', 'Eth0/1'),
-         ('R4', 'Eth0/2'): ('R6', 'Eth0/0')}
+    Этот словарь
+        {('R4', 'Fa0/1'): ('R5', 'Fa0/1'),
+         ('R4', 'Fa0/2'): ('R6', 'Fa0/0')}
 
     соответствует топологии:
-    [ R5 ]-Eth0/1 --- Eth0/1-[ R4 ]-Eth0/2---Eth0/0-[ R6 ]
+	
+    [ R5 ]-Fa0/1 --- Fa0/1-[ R4 ]-Fa0/2---Fa0/0-[ R6 ]
 
     Функция генерирует топологию, в формате svg.
     И записывает файл topology.svg в каталог img.
     '''
-    nodes = set([key[0] for key in topology_dict.keys() + topology_dict.values()])
-
-    graph = gv.Graph(format='svg')
+	#поправить строчку
+    nodes = set(key[0][0] for key in ( list(topology_dict.keys()) , list(topology_dict.values())))
+    print ("nodes",nodes)
+    print ("topology_dict",topology_dict)
+	
+    g1 = gv.Graph(format='svg')
 
     for node in nodes:
-        graph.node(node)
+        g1.node(node)		
 
-    for key, value in topology_dict.iteritems():
+    for key, value in topology_dict.items():
         head, t_label = key
         tail, h_label = value
-        graph.edge(head, tail, headlabel=h_label, taillabel=t_label, label=" "*12)
+        g1.edge(head, tail, headlabel=h_label, taillabel=t_label, label=" "*12)
 
-    graph = apply_styles(graph, style_dict)
-    filename = graph.render(filename=out_filename)
-    print "Topology saved in", filename
+    g1 = apply_styles(g1, styles)
+    filename = g1.render(filename='img/topology')
+    print ("Graph saved in", filename)
+
