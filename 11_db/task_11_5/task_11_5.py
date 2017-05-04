@@ -27,11 +27,11 @@ import yaml
 import os
 import datetime
 
+
 db_filename = 'dhcp_snooping.db'
 dhcp_snoop_files = glob.glob('sw*_dhcp_snooping.txt')
-
 db_exists = os.path.exists(db_filename)
-regex = re.compile('(?P<mac>.+?) +(?P<ip>.*?) +\d+ +[\w-]+ +(?P<vlan>\d+) +(?P<interface>.*$)')
+
 
 
 def add_data_switches(filename = 'switches.yml'):
@@ -48,6 +48,7 @@ def add_data_switches(filename = 'switches.yml'):
 
 	
 def add_data_dhcp(dhcp_snoop_file):
+	regex = re.compile('(?P<mac>.+?) +(?P<ip>.*?) +\d+ +[\w-]+ +(?P<vlan>\d+) +(?P<interface>.*$)')
 	con = sqlite3.connect(db_filename)	
 	current_mac = con.execute('select mac from dhcp').fetchall()
 	#print (current_mac)
@@ -59,12 +60,12 @@ def add_data_dhcp(dhcp_snoop_file):
 				mac = regex.search(line).group("mac")
 				ip = regex.search(line).group("ip")
 				vlan = regex.search(line).group("vlan")
-				interface = regex.search(line).group("interface")
-				last_active = str(datetime.datetime.today().replace(microsecond=0))
+				interface = regex.search(line).group("interface")					
+				
 				#кортеж из 1 элемента
-				if (mac, ) in current_mac:
-					#print(mac)
-					query = "UPDATE  dhcp set active = 0 where mac = '{}' ".format(mac)		
+				if (mac, ) in current_mac:					
+					query = "UPDATE  dhcp set active = 0 where mac = '{}' ".format(mac)	
+					#query = "UPDATE  dhcp set last_active = '{}'  ".format(week_ago)					
 					con.execute(query)
 					
 					row = con.execute(("select * from dhcp where mac = '{}' ").format(mac)).fetchall() 	
@@ -81,24 +82,45 @@ def add_data_dhcp(dhcp_snoop_file):
 					
 	con.commit()
 			
+
+
 	
+
+def del_old():
+		
+	con = sqlite3.connect(db_filename)
+	#Позволяет далее обращаться к данным в колонках, по имени колонки
+	con.row_factory = sqlite3.Row
+	for row in con.execute("SELECT * from dhcp"):		
+		if (week_ago > datetime.datetime.strptime(row['last_active'], "%Y-%m-%d %H:%M:%S") ):
+			query = "DELETE from dhcp where last_active = '{}'".format(row['last_active'])
+			con.execute(query)
+			print("Row deleted")
+	con.commit()
+		
+
+			
 			
 def test():
 	con = sqlite3.connect(db_filename)
-	if __name__ == "__main__": 			
+	if __name__ == "__main__": 				
 		#for row in con.execute("select * from switches"):
 		#	print ("Row:",row	)	
 		for row in con.execute("select * from dhcp"):
 			print ("Row:",row)
 		
-		
 
+	
 			
 if db_exists:	
 	for dhcp_snoop_file in dhcp_snoop_files:
-		hostname = dhcp_snoop_file[:dhcp_snoop_file.find("_")]			
+		hostname = dhcp_snoop_file[:dhcp_snoop_file.find("_")]	
+		last_active = datetime.datetime.today().replace(microsecond=0)	
+		week_ago = last_active - datetime.timedelta(days = 7)
+		
+		del_old()
 		add_data_dhcp(dhcp_snoop_file)
-	
+		
 
 	test()		
 else:
