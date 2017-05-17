@@ -13,12 +13,13 @@ commands = [ 'interface  loopback 0',
 
 
 
-def send_config_commands(device_list, commands):
+def send_config_commands(device_list, commands , output= True):
 	for device in device_list.keys():
 		ssh = netmiko.ConnectHandler(**device_list[device])
 		ssh.enable()
 		result = ssh.send_config_set(commands)
-		print({device_list[device]['ip']: result})
+		if output:
+			print({device_list[device]['ip']: result})
 		
 	return( {device_list[device]['ip']: result})
 	

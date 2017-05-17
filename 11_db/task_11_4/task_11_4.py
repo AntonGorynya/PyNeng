@@ -14,7 +14,7 @@ keys = ['mac', 'ip', 'vlan', 'interface', 'switch','active']
 #active
 
 		
-def out(db_filename,key = False, value = False ):
+def get_data(db_filename,key = False, value = False ):
 	with sqlite3.connect(db_filename) as conn:
 		#Позволяет далее обращаться к данным в колонках, по имени колонки
 		conn.row_factory = sqlite3.Row
@@ -42,11 +42,11 @@ if sys.argv[2:]:
 	for k in keys:
 		if k == key:
 			keys.remove(key)
-			out(db_filename,key, value)
+			get_data(db_filename,key, value)
 			flag = True
 	if not flag:
 		print("Key must be in range ", keys)
 elif sys.argv[1:]: 
 	print("0 or 2 arguments")
 else:
-	out(db_filename)	
+	get_data(db_filename)	
