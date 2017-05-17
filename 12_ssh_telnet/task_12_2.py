@@ -14,14 +14,25 @@ commands = [ 'interface  loopback 0',
 
 
 def send_config_commands(device_list, commands , output= True):
+	result_dict = {}
 	for device in device_list.keys():
 		ssh = netmiko.ConnectHandler(**device_list[device])
-		ssh.enable()
+		ssh.enable()	
 		result = ssh.send_config_set(commands)
-		if output:
-			print({device_list[device]['ip']: result})
 		
-	return( {device_list[device]['ip']: result})
+		if result.count('Incomplete command'):
+			print ('Error during executing "%s" on %s: Incomplete command' % (commands, device_list[device]['ip']))
+		elif result.count('Ambiguous command'):
+			print ('Error during executing "%s" on %s: Ambiguous command' % (commands, device_list[device]['ip']))
+		elif result.count('Invalid input'):
+			print ('Error during executing "%s" on %s: Invalid input' % (commands, device_list[device]['ip']))
+		else:
+			result_dict.update({device_list[device]['ip']: result})
+			if output:
+				print({device_list[device]['ip']: result})	
+		
+	return(result_dict)
+		
 	
 
 
