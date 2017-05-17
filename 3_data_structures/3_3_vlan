@@ -1,0 +1,11 @@
+#! /usr/bin/python
+
+import sys
+
+CONFIG = "switchport trunk allowed vlan 1,3,10,20,30,100"
+CONFIG2 = "switchport trunk allowed vlan 1,3,100,200,300"
+def exvlan(CONFIG):
+    VLANS = CONFIG.split()[-1].split(",")
+    return VLANS
+
+print set.intersection(set(exvlan(CONFIG)),set(exvlan(CONFIG2)))

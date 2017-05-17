@@ -1,0 +1,45 @@
+#! /usr/bin/python3
+
+f8 = 0
+while f8 == False:
+    IP = input('Enter IP address in format 10.10.10.10: ')
+    try:
+        IP = IP.split(".")
+        f8=int(IP[0])
+        for i in IP:
+            if (int(i)>255) and (i >=0):
+                 print ("Octet mus be  From 0 to 255")
+                 f8 =0
+            else:
+                f8 = 1
+    except:
+        print ("Incorrect")
+        f8 = 0
+
+
+def ulb(IP):
+    for i in IP:
+        if IP[0]!=i:
+            return 1
+    return 0
+
+if f8 == 0:
+    if (ulb(IP) == 0):
+        print ("unasigned")
+    else:
+        print ("unused")
+elif f8<128:
+    print ("Class A - unicast")
+elif f8 < 192:
+    print ("Class B - unicast")
+elif f8 < 224:
+    print ("Class C - unicast")
+elif f8 < 240:
+    print ("Class D - multicst")
+elif (f8 == 255) and (ulb(IP) == 0):
+    print ("local broadcast")
+else:
+    print ("unused")
+
+
+

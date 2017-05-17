@@ -1,0 +1,12 @@
+#! /usr/bin/python3
+
+from sys import argv
+
+argv[1]="CAM_table.txt"
+
+with open(argv[1], 'r') as f:
+	for command in f:
+		command_list = command.split()
+		if (len(command_list) == 4 and command_list[0].isdigit()):
+			command_list.remove(command_list[2])
+			print ("    ".join(command_list))

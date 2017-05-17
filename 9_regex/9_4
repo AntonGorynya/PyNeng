@@ -1,0 +1,22 @@
+#! /usr/bin/python
+import re
+
+def parse_sh_ip_int_br(file_name):
+	list_out=[]
+	regex_str ="(?P<interface>.+?) +(?P<ip>[\d\.]+|unassigned) +.+? +.+? +(?P<status>up|down|adm.+) +(?P<protocol>.+)"
+	regex=re.compile(regex_str)		
+	with open(file_name, 'r') as f:
+		for line in f:				
+			#match = re.search(regex_str,line)
+			match = regex.search(line)
+			if match:				
+				list_out.append(tuple(match.groupdict().values()))
+				
+	return list_out
+	
+				
+if __name__ == "__main__":	
+	from sys import argv
+	file_name = argv[1]	
+	print(parse_sh_ip_int_br(file_name))
+	

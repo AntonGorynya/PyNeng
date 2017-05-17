@@ -1,0 +1,32 @@
+#! /usr/bin/python
+import re
+
+def parse_cfg(file_name):
+	regex_str = "^ ip a.+[\d\.]+\s+[\d\.]+"
+	regex_str2 = "^interface"
+	regex = re.compile(regex_str)
+	regex2 = re.compile(regex_str2)
+	list_out=[]
+	d_keys=[]
+	flag = False
+	with open(file_name, 'r') as f:
+		sh_output=f.readlines()
+		for line in sh_output:
+			interface = re.findall(regex2, line)
+			if interface:
+				key=line[line.find(" "):].rstrip()
+				flag = True								
+			m = re.findall(regex, line)			
+			if m and flag == True:
+				#print(key)
+				d_keys.append(key)
+				list_out.append(tuple(m[0].split(" ")[-2::]))
+				flag = False
+				
+	return dict(zip(d_keys,list_out))
+				
+if __name__ == "__main__":	
+	from sys import argv
+	file_name = argv[1]	
+	print(parse_cfg(file_name))
+	

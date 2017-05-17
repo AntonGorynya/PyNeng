@@ -1,0 +1,15 @@
+#! /usr/bin/python
+import re
+
+def convert_to_dict(headers,list_tuples):
+	list_out=[]
+	for el in list_tuples:		
+		list_out.append(dict(zip(headers,list(el))))				
+	return list_out
+	
+				
+if __name__ == "__main__":	
+	list_tuples = [('FastEthernet0/0', '15.0.15.1', 'up', 'up'), ('FastEthernet0/1', '10.0.12.1', 'up', 'up'), ('FastEthernet0/2', '10.0.13.1', 'up', 'up'), ('FastEthernet0/3', 'unassigned', 'administratively down', 'down'), ('Loopback0', '10.1.1.1', 'up', 'up'), ('Loopback100', '100.0.0.1', 'up', 'up')]
+	headers = ['interface', 'address', 'status', 'protocol']
+	print(convert_to_dict(headers,list_tuples))
+	
