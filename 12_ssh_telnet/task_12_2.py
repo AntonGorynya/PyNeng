@@ -1,41 +1,29 @@
+#! /usr/bin/python3
 # -*- coding: utf-8 -*-
 
-'''
-Задание 12.2
-
-Создать функцию send_config_commands
-
-Функция подключается по SSH (с помощью netmiko) к устройствам из списка, и выполняет перечень команд в конфигурационном режиме
-на основании переданных аргументов:
-* devices_list - список словарей с параметрами подключения к устройствам, которым надо передать команды
-* config_commands - список команд, которые надо выполнить
-
-Функция возвращает словарь с результатами выполнения команды:
-* ключ - IP устройства
-* значение - результат выполнения команды
-
-Проверить работу функции на примере:
-* устройств из файла devices.yaml (для этого надо считать информацию из файла)
-* и списка команд commands
-'''
-
-
 import netmiko
+import yaml
 
-commands = [ 'logging 10.255.255.1',
-             'logging buffered 20010',
-             'no logging console' ]
 
-def send_config_commands(device_list, config_commands):
-    """
-    Функция подключается по SSH к устройствам из списка, и выполняет show команду
-    на основании переданных аргументов:
-        - devices_list - список словарей с параметрами подключения к устройствам, которым надо передать команды
-        - config_commands - список команд, которые надо выполнить
 
-    Функция возвращает словарь с результатами выполнения команды:
-        - ключ - IP устройства
-        - значение - результат выполнения команды
+device_list = yaml.load(open('devices3.yaml'))
 
-    """
+commands = [ 'interface  loopback 0',
+             'shutdown']
 
+
+
+def send_config_commands(device_list, commands):
+	for device in device_list.keys():
+		ssh = netmiko.ConnectHandler(**device_list[device])
+		ssh.enable()
+		result = ssh.send_config_set(commands)
+		print({device_list[device]['ip']: result})
+		
+	return( {device_list[device]['ip']: result})
+	
+
+
+if __name__ == "__main__":
+	send_config_commands(device_list, commands)
+		
