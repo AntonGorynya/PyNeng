@@ -5,6 +5,7 @@
 import netmiko 
 import yaml
 import getpass
+import os
 
 device_list = yaml.load(open('devices3.yaml'))
 commands = [ 'interface  loopback 0',
@@ -86,12 +87,20 @@ def send_commands(device_list, config=[], show='', filename=''):
 	if filename:
 		return send_commands_from_file(device_list, filename, output=True)
 	
-		
+def ping(ip, count):	 
+	responce = os.system("ping -c {} ".format(count) + ip)	
+	return responce
+	
+	
 
+	
 if __name__ == "__main__":
-#	print("Config")
-#	print(send_commands(device_list,config = commands ))
-#	print("Show")
-#	print(send_commands(device_list,show = command))
-#	print("From File")
-	print(send_commands(device_list,filename = 'config.txt' ))	
+	for device_type in device_list.keys():
+		for device in device_list[device_type]:
+			if ping(device['ip'],2) == 0:			
+#				print("Config")
+#				print(send_commands(device_list,config = commands ))
+#				print("Show")
+#				print(send_commands(device_list,show = command))
+				print("From File")
+#				print(send_commands(device_list,filename = 'config.txt' ))	
