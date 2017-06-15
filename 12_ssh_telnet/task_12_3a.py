@@ -27,59 +27,66 @@ for device_type in device_list.keys():
 
 def send_show_command(device_list, show_command):
 	result_dict = {}
-	for device_type in device_list.keys():
-		for device in device_list[device_type]:
-			if ping(device['ip'],2) == 0:
-				ssh = netmiko.ConnectHandler(**device)
-				ssh.enable()
-				result = str(ssh.send_command(show_command))
-				result_dict.update({device['ip']: result})
-				#print(result_dict[device['ip']])
+	for device in device_list:
+		try:
+			ssh = netmiko.ConnectHandler(**device)
+			ssh.enable()
+			result = str(ssh.send_command(show_command))
+			result_dict.update({device['ip']: result})	
+		except:
+			print("unable to connect to {}".format(device['ip']))	
 		
 	return(result_dict)
 
 
-
 def send_config_commands(device_list, config_commands, output=True):
 	result_dict = {}
-	for device_type in device_list.keys():
-		for device in device_list[device_type]:
-			if ping(device['ip'],2) == 0:
-				ssh = netmiko.ConnectHandler(**device)
-				ssh.enable()	
-				result = ssh.send_config_set(config_commands)
-			
-				if result.count('Incomplete command'):
-					print ('Error during executing "%s" on %s: Incomplete command' % (config_commands, device['ip']))
-				elif result.count('Ambiguous command'):
-					print ('Error during executing "%s" on %s: Ambiguous command' % (config_commands, device['ip']))
-				elif result.count('Invalid input'):
-					print ('Error during executing "%s" on %s: Invalid input' % (config_commands, device['ip']))
-				else:
-					result_dict.update({device['ip']: result})
-					if output:
-						print({device['ip']: result})	
+	for device in device_list:
+		result =""
+		print(device['ip'])
+		try:
+			ssh = netmiko.ConnectHandler(**device)
+			ssh.enable()		
+			result = ssh.send_config_set(commands)
+		except:
+			print("unable to connect to {}".format(device['ip']))
+		
+				
+		if result.count('Incomplete command'):
+			print ('Error during executing "%s" on %s: Incomplete command' % (commands, device['ip']))
+		elif result.count('Ambiguous command'):
+			print ('Error during executing "%s" on %s: Ambiguous command' % (commands, device['ip']))
+		elif result.count('Invalid input'):
+			print ('Error during executing "%s" on %s: Invalid input' % (commands, device['ip']))
+		else:
+			result_dict.update({device['ip']: result})
+	if output:
+		print(result_dict)	
+		
 	return(result_dict)
 
 def send_commands_from_file(device_list, filename, output=True):
 	result_dict = {}
-	for device_type in device_list.keys():
-		for device in device_list[device_type]:
-			if ping(device['ip'],2) == 0:
-				ssh = netmiko.ConnectHandler(**device)
-				ssh.enable()	
-				result = ssh.send_config_from_file(filename)
-			
-				if result.count('Incomplete command'):
-					print ('Error during executing "%s" on %s: Incomplete command in file' % (filename, device['ip']))
-				elif result.count('Ambiguous command'):
-					print ('Error during executing "%s" on %s: Ambiguous command' % (filename, device['ip']))
-				elif result.count('Invalid input'):
-					print ('Error during executing "%s" on %s: Invalid input' % (filename, device['ip']))
-				else:
-					result_dict.update({device['ip']: result})
-					if output:
-						print({device['ip']: result})		
+	for device in device_list:
+		result =""
+		print(device['ip'])
+		try:
+			ssh = netmiko.ConnectHandler(**device)
+			ssh.enable()		
+			result = ssh.send_config_from_file(filename)
+		except:
+			print("unable to connect to {}".format(device['ip']))
+		
+		if result.count('Incomplete command'):
+			print ('Error during executing "%s" on %s: Incomplete command' % (commands, device['ip']))
+		elif result.count('Ambiguous command'):
+			print ('Error during executing "%s" on %s: Ambiguous command' % (commands, device['ip']))
+		elif result.count('Invalid input'):
+			print ('Error during executing "%s" on %s: Invalid input' % (commands, device['ip']))
+		else:
+			result_dict.update({device['ip']: result})
+	if output:
+		print(result_dict)		
 	return(result_dict)
 
 def send_commands(device_list, config=[], show='', filename=''):
@@ -90,18 +97,14 @@ def send_commands(device_list, config=[], show='', filename=''):
 	if filename:
 		return send_commands_from_file(device_list, filename, output=True)
 	
-def ping(ip, count):
-	responce = 1
-	responce = os.system("ping -c {} ".format(count) + ip)	
-	return responce
-	
-	
+		
 
+if __name__ == "__main__":
+	for device_type in device_list.keys():
+		print("Config",device_type )
+		print(send_commands(device_list[device_type],config = commands ))
+	#	print("Show")
+	#	print(send_commands(device_list[device_type],show = command))
+	#	print("From File")
+	#	print(send_commands(device_list[device_type],filename = 'config.txt' ))
 	
-if __name__ == "__main__":		
-#	print("Config")
-#	print(send_commands(device_list,config = commands ))
-	print("Show")
-	print(send_commands(device_list,show = command))
-#	print("From File")
-#	print(send_commands(device_list,filename = 'config.txt' ))	

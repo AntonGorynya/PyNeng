@@ -26,7 +26,7 @@ import yaml
 import sys
 
 command = sys.argv[1]
-device_list = yaml.load(open('devices3.yaml'))
+device_list = yaml.load(open('devices.yaml'))
 
 
 def send_show_command(device, command):	
@@ -38,6 +38,10 @@ def send_show_command(device, command):
 
 
 if __name__ == "__main__":
-	for router in device_list.keys():
-		send_show_command(device_list[router], command)
-		
+	for device_type in device_list.keys():
+		for device in device_list[device_type]:	
+			print(device['ip'])
+			try:
+				print(send_show_command(device, command))
+			except:
+				print("unable to connect")

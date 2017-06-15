@@ -2,4 +2,4 @@ routers:
 - device_type: cisco_ios
   ip: 192.168.102.226
 - device_type: cisco_ios
-  ip: 10.168.102.2
+  ip: 192.168.102.71

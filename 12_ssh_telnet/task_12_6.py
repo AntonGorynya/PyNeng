@@ -1,3 +1,4 @@
+#! /usr/bin/python3
 # -*- coding: utf-8 -*-
 """
 Задание 12.6
@@ -12,23 +13,105 @@
 
 Пример из раздела:
 """
-
-import multiprocessing
 from netmiko import ConnectHandler
 import sys
 import yaml
+import threading
+#import queue
+from queue import Queue
+import netmiko 
+import multiprocessing
+
 
 
 COMMAND = sys.argv[1]
 devices = yaml.load(open('devices.yaml'))
+print(COMMAND)
 
-def connect_ssh(device_dict, command, queue):
-    ssh = ConnectHandler(**device_dict)
-    ssh.enable()
-    result = ssh.send_command(command)
+def send_show_command(device_list, show_command):
+	result_dict = {}
+	for device in device_list:
+		try:
+			ssh = netmiko.ConnectHandler(**device)
+			ssh.enable()
+			result = str(ssh.send_command(show_command))
+			result_dict.update({device['ip']: result})	
+			print("Connected to {}".format(device['ip']))
+		except:
+			result_dict.update({device['ip']: ""})
+			print("unable to connect to {}".format(device['ip']))	
+		
+	return(result_dict)
 
-    print "Connection to device %s" % device_dict['ip']
-    queue.put({device_dict['ip']: result})
+
+def send_config_commands(device_list, commands, output=True):
+	result_dict = {}
+	for device in device_list:
+		result =""
+		print("connecting to ", device['ip'])
+		try:
+			ssh = netmiko.ConnectHandler(**device)
+			ssh.enable()
+			print("sending commands {} to".format(commands[0]), device['ip'])
+			
+			result = ssh.send_config_set(commands)
+			print("Connected to {}".format(device['ip']))				
+			if result.count('Incomplete command'):
+				print ('Error during executing "%s" on %s: Incomplete command' % (commands, device['ip']))
+			elif result.count('Ambiguous command'):
+				print ('Error during executing "%s" on %s: Ambiguous command' % (commands, device['ip']))
+			elif result.count('Invalid input'):
+				print ('Error during executing "%s" on %s: Invalid input' % (commands, device['ip']))
+			else:
+				result_dict.update({device['ip']: result})	
+			print("command send successeful for {}".format(device['ip']))		
+		except:
+			result_dict.update({device['ip']: result})
+			print("unable to connect to {}".format(device['ip']))
+	if output:
+		print(result_dict)	
+		
+	return(result_dict)
+
+def send_commands_from_file(device_list, filename, output=True):
+	result_dict = {}
+	for device in device_list:
+		result =""
+		print(device['ip'])
+		try:
+			ssh = netmiko.ConnectHandler(**device)
+			ssh.enable()		
+			result = ssh.send_config_from_file(filename)
+			print("Connected to {}".format(device['ip']))		
+			if result.count('Incomplete command'):
+				print ('Error during executing "%s" on %s: Incomplete command' % (commands, device['ip']))
+			elif result.count('Ambiguous command'):
+				print ('Error during executing "%s" on %s: Ambiguous command' % (commands, device['ip']))
+			elif result.count('Invalid input'):
+				print ('Error during executing "%s" on %s: Invalid input' % (commands, device['ip']))
+			else:
+				result_dict.update({device['ip']: result})
+		except:
+			result_dict.update({device['ip']: result})
+			print("unable to connect to {}".format(device['ip']))
+	if output:
+		print(result_dict)		
+	return(result_dict)
+
+def send_commands(device_list, queue, config=[], show='', filename='' ):
+		
+	if config:
+		#print("config command is",config)
+		#return send_config_commands(device_list, config, output=False)	
+		queue.put(send_config_commands(device_list, config, output=False))
+	if show:
+		#print("show command is",show)
+		#return send_show_command(device_list, show)
+		queue.put(send_show_command(device_list, show))		
+	if filename:
+		#print("filename command is",filename)
+		#return send_commands_from_file(device_list, filename, output=True)
+		queue.put(send_commands_from_file(device_list, filename, output=True))
 
 
 def conn_processes(function, devices, command):
@@ -36,7 +119,7 @@ def conn_processes(function, devices, command):
     queue = multiprocessing.Queue()
 
     for device in devices:
-        p = multiprocessing.Process(target = function, args = (device, command, queue))
+        p = multiprocessing.Process(target = function, args = ([device],queue, [command] ))
         p.start()
         processes.append(p)
 
@@ -49,4 +132,4 @@ def conn_processes(function, devices, command):
 
     return results
 
-print( conn_processes(connect_ssh, devices['routers'], COMMAND) )
+print( conn_processes(send_commands, devices['routers'], COMMAND) )
