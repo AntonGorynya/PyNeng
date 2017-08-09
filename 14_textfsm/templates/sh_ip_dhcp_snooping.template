@@ -1,0 +1,7 @@
+Value MAC (..:..:..:..:..:..)
+Value ADDR ([\d\.]+)
+Value VLAN (\d+)
+Value INT (\S+)
+
+Start
+  ^${MAC}\s+${ADDR}\s+\d+\s+[\w-]+\s+${VLAN}\s+${INT} -> Record
